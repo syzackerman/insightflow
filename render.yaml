@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: insightflow
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: insightflow-db
+          property: connectionString
+      - key: SPRING_SQL_INIT_MODE
+        value: always
+      - key: INSIGHTFLOW_ANALYTICS_MODE
+        value: json
+      - key: INSIGHTFLOW_AI_PROVIDER
+        value: local
+      - key: INSIGHTFLOW_JWT_SECRET
+        generateValue: true
+      - key: INSIGHTFLOW_JWT_EXPIRATION_MINUTES
+        value: 1440
+      - key: OPENAI_API_KEY
+        sync: false
+
+databases:
+  - name: insightflow-db
+    databaseName: insightflow
+    user: insightflow_user
+    plan: free

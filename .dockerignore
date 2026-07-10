@@ -1,0 +1,6 @@
+.git
+.DS_Store
+backend/target
+node_modules
+docs/demo/*.gif
+data/olist_geolocation_dataset.csv

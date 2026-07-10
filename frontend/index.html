@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InsightFlow Business Analytics</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232f7d57'/%3E%3Cpath d='M8 22h16v3H8zm1-5h5v3H9zm7-5h5v8h-5zm7-5h4v13h-4z' fill='white'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="topbar" aria-label="Dashboard header">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span>
+          </div>
+          <div>
+            <p class="eyebrow">Olist Ecommerce Analysis</p>
+            <h1>InsightFlow</h1>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span class="mode-badge loading" id="sourceMode">Connecting</span>
+          <button type="button" class="export-button" id="exportCsv" data-icon="download" disabled>Export CSV</button>
+          <div class="status-pill" id="generatedAt">Loading data</div>
+        </div>
+      </section>
+
+      <form class="filter-bar" id="filterForm" aria-label="Dashboard filters">
+        <label>
+          <span>Start date</span>
+          <input type="date" id="startDate" name="startDate" />
+        </label>
+        <label>
+          <span>End date</span>
+          <input type="date" id="endDate" name="endDate" />
+        </label>
+        <label>
+          <span>State</span>
+          <select id="state" name="state">
+            <option value="">All states</option>
+          </select>
+        </label>
+        <label>
+          <span>Category</span>
+          <select id="category" name="category">
+            <option value="">All categories</option>
+          </select>
+        </label>
+        <label>
+          <span>Payment</span>
+          <select id="paymentType" name="paymentType">
+            <option value="">All payments</option>
+          </select>
+        </label>
+        <div class="filter-actions">
+          <button type="submit" id="applyFilters" data-icon="filter">Apply</button>
+          <button type="button" class="secondary" id="resetFilters" data-icon="rotate">Reset</button>
+        </div>
+      </form>
+
+      <section class="workspace-grid" aria-label="Account and dashboard workspace">
+        <article class="panel workspace-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Account</p>
+              <h2>JWT workspace</h2>
+            </div>
+            <button type="button" class="secondary" id="logoutUser" data-icon="logout" hidden>Sign Out</button>
+          </div>
+          <div class="account-status" id="accountStatus">Sign in to save dashboards and preferences.</div>
+          <form class="auth-form" id="authForm">
+            <input type="text" id="displayName" placeholder="Display name" autocomplete="name" />
+            <input type="email" id="authEmail" placeholder="Email" autocomplete="email" required />
+            <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password" required />
+            <div class="auth-actions">
+              <button type="button" id="loginUser" data-icon="login">Sign In</button>
+              <button type="button" class="secondary" id="registerUser" data-icon="user-plus">Create Account</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="panel workspace-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Saved Dashboards</p>
+              <h2>Personal views</h2>
+            </div>
+          </div>
+          <div class="saved-dashboard-controls">
+            <input type="text" id="dashboardName" placeholder="Dashboard name" />
+            <button type="button" id="saveDashboard" data-icon="save">Save Current</button>
+            <select id="savedDashboards">
+              <option value="">No saved dashboards</option>
+            </select>
+            <div class="auth-actions">
+              <button type="button" class="secondary" id="loadDashboardView" data-icon="folder-open">Load</button>
+              <button type="button" class="secondary" id="deleteDashboardView" data-icon="trash">Delete</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel workspace-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Preferences</p>
+              <h2>Dashboard settings</h2>
+            </div>
+          </div>
+          <div class="preference-controls">
+            <label>
+              <span>Theme</span>
+              <select id="preferenceTheme">
+                <option value="light">Light</option>
+                <option value="focus">Focus</option>
+              </select>
+            </label>
+            <label class="check-control">
+              <input type="checkbox" id="compactView" />
+              <span>Compact view</span>
+            </label>
+            <button type="button" id="savePreferences" data-icon="settings">Save Preferences</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="message-panel" id="messagePanel" hidden></section>
+
+      <section class="kpi-grid" id="kpiGrid" aria-label="Business KPIs"></section>
+
+      <section class="ai-grid" aria-label="AI Business Analyst">
+        <article class="panel ai-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">AI Business Analyst</p>
+              <h2>Executive report</h2>
+            </div>
+            <button type="button" id="generateReport" data-icon="sparkles">Generate Report</button>
+          </div>
+          <div class="ai-mode" id="reportMode">Local analyst ready</div>
+          <div class="ai-output" id="reportOutput">
+            <div class="chart-state">
+              <strong>Executive brief ready</strong>
+              <span>Current dashboard view awaiting analysis.</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel ai-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Business Analyst</p>
+              <h2>Ask anything</h2>
+            </div>
+          </div>
+          <form class="question-form" id="questionForm">
+            <label>
+              <span>Question</span>
+              <textarea id="analystQuestion" rows="3" placeholder="Why did revenue decrease?"></textarea>
+            </label>
+            <div class="prompt-chip-row" aria-label="Suggested analyst questions">
+              <button type="button" class="prompt-chip" data-icon="trend-down" data-prompt="Why did revenue decrease?">Revenue decrease</button>
+              <button type="button" class="prompt-chip" data-icon="megaphone" data-prompt="Which categories should I promote?">Promote categories</button>
+              <button type="button" class="prompt-chip" data-icon="calendar" data-prompt="Summarize Q2 performance.">Q2 summary</button>
+              <button type="button" class="prompt-chip" data-icon="map" data-prompt="Which states need attention?">State opportunities</button>
+            </div>
+            <button type="submit" id="askAnalyst" data-icon="send">Ask Analyst</button>
+          </form>
+          <div class="ai-mode" id="queryMode">Local analyst ready</div>
+          <div class="ai-output" id="queryOutput"></div>
+        </article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel wide">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Revenue Trend</p>
+              <h2>Monthly item revenue</h2>
+            </div>
+            <span id="trendNote"></span>
+          </div>
+          <div class="chart-frame" id="monthlyChart"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Category Mix</p>
+              <h2>Top revenue categories</h2>
+            </div>
+          </div>
+          <div class="chart-frame medium" id="categoryList"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Regional Demand</p>
+              <h2>Top customer states</h2>
+            </div>
+          </div>
+          <div class="chart-frame medium" id="stateList"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Customer Experience</p>
+              <h2>Review scores</h2>
+            </div>
+          </div>
+          <div class="chart-frame short" id="reviewChart"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Payments</p>
+              <h2>Payment value mix</h2>
+            </div>
+          </div>
+          <div class="chart-frame short" id="paymentList"></div>
+        </article>
+      </section>
+    </main>
+    <script src="src/app.js"></script>
+  </body>
+</html>

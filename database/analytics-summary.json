@@ -1,0 +1,348 @@
+{
+  "generatedAt": "2026-07-09T00:45:55Z",
+  "source": "Brazilian Olist ecommerce public dataset",
+  "kpis": {
+    "deliveredOrders": 96478,
+    "uniqueCustomers": 93358,
+    "itemsSold": 110197,
+    "itemRevenue": 13221498.11,
+    "averageOrderValue": 137.04,
+    "averageReviewScore": 4.16,
+    "onTimeDeliveryRate": 91.9,
+    "averageDeliveryDays": 12.6
+  },
+  "monthlySales": [
+    {
+      "month": "2016-09",
+      "revenue": 134.97,
+      "orders": 1,
+      "items": 3
+    },
+    {
+      "month": "2016-10",
+      "revenue": 40325.11,
+      "orders": 265,
+      "items": 313
+    },
+    {
+      "month": "2016-12",
+      "revenue": 10.9,
+      "orders": 1,
+      "items": 1
+    },
+    {
+      "month": "2017-01",
+      "revenue": 111798.36,
+      "orders": 750,
+      "items": 913
+    },
+    {
+      "month": "2017-02",
+      "revenue": 234223.4,
+      "orders": 1653,
+      "items": 1858
+    },
+    {
+      "month": "2017-03",
+      "revenue": 359198.85,
+      "orders": 2546,
+      "items": 2897
+    },
+    {
+      "month": "2017-04",
+      "revenue": 340669.68,
+      "orders": 2303,
+      "items": 2569
+    },
+    {
+      "month": "2017-05",
+      "revenue": 489338.25,
+      "orders": 3546,
+      "items": 4004
+    },
+    {
+      "month": "2017-06",
+      "revenue": 421923.37,
+      "orders": 3135,
+      "items": 3489
+    },
+    {
+      "month": "2017-07",
+      "revenue": 481604.52,
+      "orders": 3872,
+      "items": 4416
+    },
+    {
+      "month": "2017-08",
+      "revenue": 554699.7,
+      "orders": 4193,
+      "items": 4797
+    },
+    {
+      "month": "2017-09",
+      "revenue": 607399.67,
+      "orders": 4150,
+      "items": 4737
+    },
+    {
+      "month": "2017-10",
+      "revenue": 648247.65,
+      "orders": 4478,
+      "items": 5214
+    },
+    {
+      "month": "2017-11",
+      "revenue": 987765.37,
+      "orders": 7289,
+      "items": 8475
+    },
+    {
+      "month": "2017-12",
+      "revenue": 726033.19,
+      "orders": 5513,
+      "items": 6187
+    },
+    {
+      "month": "2018-01",
+      "revenue": 924645.0,
+      "orders": 7069,
+      "items": 8037
+    },
+    {
+      "month": "2018-02",
+      "revenue": 826437.13,
+      "orders": 6555,
+      "items": 7518
+    },
+    {
+      "month": "2018-03",
+      "revenue": 953356.25,
+      "orders": 7003,
+      "items": 8017
+    },
+    {
+      "month": "2018-04",
+      "revenue": 973534.09,
+      "orders": 6798,
+      "items": 7827
+    },
+    {
+      "month": "2018-05",
+      "revenue": 977544.69,
+      "orders": 6749,
+      "items": 7810
+    },
+    {
+      "month": "2018-06",
+      "revenue": 856077.86,
+      "orders": 6099,
+      "items": 7010
+    },
+    {
+      "month": "2018-07",
+      "revenue": 867953.46,
+      "orders": 6159,
+      "items": 6963
+    },
+    {
+      "month": "2018-08",
+      "revenue": 838576.64,
+      "orders": 6351,
+      "items": 7142
+    }
+  ],
+  "categoryPerformance": [
+    {
+      "category": "Health Beauty",
+      "revenue": 1233131.72,
+      "orders": 8647,
+      "items": 9465,
+      "averageReviewScore": 4.19
+    },
+    {
+      "category": "Watches Gifts",
+      "revenue": 1166176.98,
+      "orders": 5495,
+      "items": 5859,
+      "averageReviewScore": 4.07
+    },
+    {
+      "category": "Bed Bath Table",
+      "revenue": 1023434.76,
+      "orders": 9272,
+      "items": 10953,
+      "averageReviewScore": 3.92
+    },
+    {
+      "category": "Sports Leisure",
+      "revenue": 954852.55,
+      "orders": 7530,
+      "items": 8431,
+      "averageReviewScore": 4.17
+    },
+    {
+      "category": "Computers Accessories",
+      "revenue": 888724.61,
+      "orders": 6530,
+      "items": 7644,
+      "averageReviewScore": 3.98
+    },
+    {
+      "category": "Furniture Decor",
+      "revenue": 711927.69,
+      "orders": 6307,
+      "items": 8160,
+      "averageReviewScore": 3.95
+    },
+    {
+      "category": "Housewares",
+      "revenue": 615628.69,
+      "orders": 5743,
+      "items": 6795,
+      "averageReviewScore": 4.11
+    },
+    {
+      "category": "Cool Stuff",
+      "revenue": 610204.1,
+      "orders": 3559,
+      "items": 3718,
+      "averageReviewScore": 4.19
+    },
+    {
+      "category": "Auto",
+      "revenue": 578966.65,
+      "orders": 3810,
+      "items": 4140,
+      "averageReviewScore": 4.12
+    },
+    {
+      "category": "Toys",
+      "revenue": 471286.48,
+      "orders": 3804,
+      "items": 4030,
+      "averageReviewScore": 4.21
+    },
+    {
+      "category": "Garden Tools",
+      "revenue": 470495.28,
+      "orders": 3448,
+      "items": 4268,
+      "averageReviewScore": 4.08
+    },
+    {
+      "category": "Baby",
+      "revenue": 400421.84,
+      "orders": 2809,
+      "items": 2982,
+      "averageReviewScore": 4.08
+    }
+  ],
+  "statePerformance": [
+    {
+      "state": "SP",
+      "revenue": 5067633.16,
+      "orders": 40501
+    },
+    {
+      "state": "RJ",
+      "revenue": 1759651.13,
+      "orders": 12350
+    },
+    {
+      "state": "MG",
+      "revenue": 1552481.83,
+      "orders": 11354
+    },
+    {
+      "state": "RS",
+      "revenue": 728897.47,
+      "orders": 5345
+    },
+    {
+      "state": "PR",
+      "revenue": 666063.51,
+      "orders": 4923
+    },
+    {
+      "state": "SC",
+      "revenue": 507012.13,
+      "orders": 3546
+    },
+    {
+      "state": "BA",
+      "revenue": 493584.14,
+      "orders": 3256
+    },
+    {
+      "state": "DF",
+      "revenue": 296498.41,
+      "orders": 2080
+    },
+    {
+      "state": "GO",
+      "revenue": 282836.7,
+      "orders": 1957
+    },
+    {
+      "state": "ES",
+      "revenue": 268643.45,
+      "orders": 1995
+    },
+    {
+      "state": "PE",
+      "revenue": 251889.49,
+      "orders": 1593
+    },
+    {
+      "state": "CE",
+      "revenue": 219757.38,
+      "orders": 1279
+    }
+  ],
+  "paymentMix": [
+    {
+      "type": "Credit Card",
+      "value": 12101094.88
+    },
+    {
+      "type": "Boleto",
+      "value": 2769932.58
+    },
+    {
+      "type": "Voucher",
+      "value": 343013.19
+    },
+    {
+      "type": "Debit Card",
+      "value": 208421.12
+    }
+  ],
+  "reviewDistribution": [
+    {
+      "score": 1,
+      "count": 9406
+    },
+    {
+      "score": 2,
+      "count": 2941
+    },
+    {
+      "score": 3,
+      "count": 7961
+    },
+    {
+      "score": 4,
+      "count": 18987
+    },
+    {
+      "score": 5,
+      "count": 57066
+    }
+  ],
+  "businessQuestions": [
+    "Which categories create the most revenue?",
+    "Where are the highest-value customers located?",
+    "How strongly does delivery performance support customer satisfaction?",
+    "Which payment methods account for the largest sales volume?"
+  ]
+}
