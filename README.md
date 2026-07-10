@@ -1,102 +1,87 @@
-<p align="center">
-  <img src="docs/screenshots/dashboard.png" alt="InsightFlow dashboard" width="920">
-</p>
+<p align="center"><img src="docs/screenshots/dashboard.png" alt="InsightFlow dashboard" width="900"></p>
 
 <h1 align="center">InsightFlow</h1>
 
 <p align="center">
-  A portfolio-ready business analytics platform for ecommerce performance, powered by Spring Boot, PostgreSQL, interactive dashboards, JWT workspaces, and an AI Business Analyst.
+  Full-stack business analytics platform for Olist ecommerce data with PostgreSQL analytics, JSON fallback mode, JWT workspaces, and an AI Business Analyst.
 </p>
 
 <p align="center">
-  <a href="#quick-start">Quick Start</a> ·
-  <a href="#features">Features</a> ·
-  <a href="#architecture">Architecture</a> ·
-  <a href="#api-overview">API</a> ·
-  <a href="#deployment">Deployment</a>
-</p>
-
-<p align="center">
-  <img alt="Java" src="https://img.shields.io/badge/Java-21-007396?style=flat-square">
-  <img alt="Spring Boot" src="https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F?style=flat-square">
-  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-Analytics-4169E1?style=flat-square">
-  <img alt="Docker" src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square">
+  <img alt="Java 21" src="https://img.shields.io/badge/Java-21-red?style=flat-square">
+  <img alt="Spring Boot" src="https://img.shields.io/badge/Spring%20Boot-3.5-green?style=flat-square">
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-16-blue?style=flat-square">
+  <img alt="Docker Compose" src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square">
   <img alt="JWT" src="https://img.shields.io/badge/Auth-JWT-black?style=flat-square">
-  <img alt="AI" src="https://img.shields.io/badge/AI-Business%20Analyst-8A2BE2?style=flat-square">
+  <img alt="AI Analyst" src="https://img.shields.io/badge/AI-Business%20Analyst-purple?style=flat-square">
 </p>
 
-## Overview
+## 🔗 Links
 
-InsightFlow turns the public Brazilian Olist ecommerce CSV dataset into an executive analytics product. It supports PostgreSQL-backed analytics for realistic demos, JSON fallback mode for database-free walkthroughs, authentication, saved dashboards, CSV export, and an AI analyst that answers business questions from filtered metrics.
-
-**Demo account**
-
-```text
-Email: demo@example.com
-Password: portfolio-pass
-```
-
-**Live links**
-
-| Target | URL |
+| Resource | Link |
 | --- | --- |
-| Frontend | `https://<your-render-service>.onrender.com` |
-| Backend health | `https://<your-render-service>.onrender.com/api/health` |
-| GitHub | `https://github.com/<your-username>/insightflow` |
+| GitHub Repository | [github.com/syzackerman/insightflow](https://github.com/syzackerman/insightflow) |
 
-## Screenshots
+## 📌 Overview
 
-### Dashboard
+InsightFlow is a portfolio-ready analytics application built around the Brazilian Olist ecommerce dataset. It turns raw order, customer, product, payment, review, and delivery CSV files into filtered business metrics and interactive dashboard views.
 
-![InsightFlow dashboard](docs/screenshots/dashboard.png)
+Designed as a production-style portfolio project to demonstrate backend engineering, REST API design, SQL analytics, authentication, Docker deployment, and AI integration.
 
-### Demo Walkthrough
+The backend is a Java 21 Spring Boot API with a PostgreSQL query layer, DTO-based responses, JWT authentication, saved dashboards, dashboard preferences, health checks, and test coverage for analytics, auth, AI, and deployment endpoints.
 
-![InsightFlow demo walkthrough](docs/demo/insightflow-demo.gif)
+The frontend is a lightweight HTML/CSS/JavaScript dashboard with KPI cards, SVG charts, filters, loading/error/empty states, CSV export, user workspace controls, and AI analyst prompts.
 
-## Features
+InsightFlow supports two analytics modes: PostgreSQL mode for realistic SQL-backed analysis, and JSON fallback mode for demos when a database is unavailable. The AI Business Analyst can run locally without an API key or use OpenAI when configured.
 
-| Area | What InsightFlow Does |
-| --- | --- |
-| Analytics | Revenue, orders, AOV, repeat customer rate, review score, delivery delay rate, category performance, state revenue, payment mix, review distribution |
-| Filters | Date range, customer state, product category, and payment type |
-| Dashboard | Responsive KPI cards, chart panels, source-mode badge, empty states, and CSV export |
-| Data modes | PostgreSQL analytics for realistic demos; JSON fallback for simple local or hosted demos |
-| AI analyst | Executive reports and natural-language business questions with local fallback or OpenAI mode |
-| Authentication | JWT login/register, BCrypt password hashing, demo account, protected workspace endpoints |
-| Saved workspace | Saved dashboards and user dashboard preferences |
-| Deployment | Dockerfile, Docker Compose, Render Blueprint, health check endpoint |
+## 🎯 Key Skills Demonstrated
 
-## Architecture
+Java · Spring Boot · REST API Design · PostgreSQL · SQL Analytics · JWT Authentication · Docker · Data Engineering · AI Integration · Business Analytics
+
+## ✨ Highlights
+
+- 📊 Analyzes 100K+ real-world Olist e-commerce transactions.
+- 🧮 Calculates revenue, orders, AOV, repeat customers, reviews, delays, categories, states, payments, and monthly trends.
+- 🗄️ Runs PostgreSQL-backed analytics with filtered SQL queries.
+- 🧾 Provides JSON fallback mode with the same `/api/analytics/summary` response shape.
+- 🖥️ Includes an interactive dashboard with KPI cards, filters, charts, source badge, and CSV export.
+- 🤖 Adds an AI Business Analyst for executive reports and natural-language questions.
+- 🔐 Supports JWT authentication with BCrypt password hashing.
+- 💾 Saves user dashboards and dashboard preferences.
+- 🐳 Ships Docker Compose PostgreSQL setup with persistent volume and healthcheck.
+- 🚢 Includes Render deployment configuration and a production health endpoint.
+
+## 🧱 Architecture
 
 ```mermaid
 flowchart LR
-  Browser["Browser Dashboard<br/>HTML + CSS + Vanilla JS"] --> Analytics
+  Browser["Browser Dashboard<br/>HTML + CSS + JavaScript"] --> Controllers["Spring Boot REST Controllers"]
 
-  subgraph Backend["Spring Boot API"]
-    Analytics["Analytics Controller + Service"]
-    AI["AI Business Analyst"]
-    Auth["JWT Auth"]
-    Workspace["Saved Dashboards"]
+  subgraph Backend["Spring Boot Backend"]
+    Controllers --> Services["Services"]
+    Services --> Analytics["Analytics Summary Service"]
+    Services --> Workspace["Auth + Dashboard Services"]
+    Services --> AI["AI Business Analyst"]
+    Analytics --> PostgresRepo["PostgreSQL Query Layer"]
+    Analytics --> JsonRepo["JSON Fallback Aggregation"]
   end
 
-  subgraph Data["Data Layer"]
-    Postgres["PostgreSQL<br/>Olist + App Tables"]
-    Json["JSON Fallback<br/>analytics-facts.json"]
-    Csv["Olist CSV Files"]
+  subgraph Data["Data Sources"]
+    Csv["Olist CSV Files"] --> Importer["Python Import Script"]
+    Importer --> Postgres["PostgreSQL"]
+    JsonFiles["analytics-facts.json"]
   end
 
-  Csv --> Importer["Python Import Pipeline"]
-  Importer --> Postgres
-  Analytics --> Postgres
-  Analytics --> Json
+  PostgresRepo --> Postgres
+  JsonRepo --> JsonFiles
   AI --> Analytics
-  Auth --> Postgres
-  Workspace --> Postgres
   AI -. optional .-> OpenAI["OpenAI Responses API"]
 ```
 
-## Database Diagram
+The dashboard calls the Spring Boot API directly. Controllers handle HTTP requests, services own business workflows, repositories isolate SQL and fallback data access, and DTO records keep response contracts explicit. PostgreSQL mode runs analytical SQL, while JSON mode reads generated aggregate facts with the same frontend contract.
+
+Authentication is stateless. The frontend stores a JWT and sends it to protected dashboard and preference endpoints. Analytics and AI endpoints are public for an easy portfolio demo.
+
+## 🗄️ Database Design
 
 ```mermaid
 erDiagram
@@ -110,85 +95,30 @@ erDiagram
 
   APP_USERS ||--o{ SAVED_DASHBOARDS : owns
   APP_USERS ||--|| DASHBOARD_PREFERENCES : configures
-
-  CUSTOMERS {
-    text customer_id PK
-    text customer_unique_id
-    text customer_state
-  }
-
-  ORDERS {
-    text order_id PK
-    text customer_id FK
-    text order_status
-    timestamp order_purchase_timestamp
-    timestamp order_delivered_customer_date
-    timestamp order_estimated_delivery_date
-  }
-
-  ORDER_ITEMS {
-    text order_id FK
-    integer order_item_id
-    text product_id FK
-    text seller_id FK
-    numeric price
-    numeric freight_value
-  }
-
-  ORDER_PAYMENTS {
-    text order_id FK
-    text payment_type
-    numeric payment_value
-  }
-
-  ORDER_REVIEWS {
-    text order_id FK
-    integer review_score
-  }
-
-  PRODUCTS {
-    text product_id PK
-    text product_category_name
-  }
-
-  APP_USERS {
-    uuid id PK
-    text email UK
-    text password_hash
-    text role
-  }
-
-  SAVED_DASHBOARDS {
-    uuid id PK
-    uuid user_id FK
-    text name
-    jsonb filters
-  }
-
-  DASHBOARD_PREFERENCES {
-    uuid user_id PK
-    text theme
-    boolean compact_view
-    jsonb visible_sections
-  }
 ```
 
-## Tech Stack
+The database schema lives in `database/schema.sql`. It includes normalized Olist tables for ecommerce analytics and application tables for users, saved dashboards, and dashboard preferences.
+
+The analytics query layer joins orders, customers, items, products, payments, and review rollups to calculate dashboard metrics. Indexes support common filters such as order date, order status, customer state, product, payment type, and saved dashboard lookup.
+
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 | --- | --- |
 | Frontend | HTML, CSS, vanilla JavaScript, SVG charts |
 | Backend | Java 21, Spring Boot 3.5, Spring Web |
 | Security | Spring Security, JWT, BCrypt |
-| Database | PostgreSQL, SQL analytics, JSONB |
-| Data pipeline | Python CSV importer |
+| Database | PostgreSQL, SQL, JSONB |
+| Data Pipeline | Python CSV import and JSON generation scripts |
 | AI | Local deterministic analyst, optional OpenAI Responses API |
 | DevOps | Docker Compose, Dockerfile, Render Blueprint |
-| Testing | JUnit, Spring MockMvc, AssertJ |
+| Testing | JUnit, Spring MockMvc, Mockito, AssertJ |
 
-## Quick Start
+## ⚙️ Installation
 
-Run the fastest local demo with JSON analytics and local AI fallback:
+### Quick Start
+
+Run the app in JSON fallback mode:
 
 ```bash
 ./scripts/run_local.sh json
@@ -200,209 +130,126 @@ Open:
 http://localhost:8080
 ```
 
-This mode does not require Docker, PostgreSQL, or an API key.
+This mode uses the generated JSON resources already included in the backend and does not require PostgreSQL.
 
-## Installation
+### Dataset Download
 
-**Requirements**
+Download the Brazilian Olist ecommerce dataset from Kaggle:
 
-- Java 21+
-- Python 3.10+
-- Docker Desktop, only for PostgreSQL mode
-- Optional: `psql` or `psycopg[binary]` for CSV import
-
-**Clone and configure**
-
-```bash
-git clone https://github.com/<your-username>/insightflow.git
-cd insightflow
-cp .env.example .env
+```text
+https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
 ```
 
-## Docker Setup
+Place the CSV files in `data/`. The `data/` directory is ignored by Git. Required files: `olist_customers_dataset.csv`, `olist_orders_dataset.csv`, `olist_order_items_dataset.csv`, `olist_order_payments_dataset.csv`, `olist_order_reviews_dataset.csv`, `olist_products_dataset.csv`, `olist_sellers_dataset.csv`, and `product_category_name_translation.csv`.
 
-Start PostgreSQL with one command:
+### JSON Mode
 
-```bash
-docker compose up -d
-docker compose ps
-```
-
-Docker Compose creates:
-
-| Setting | Value |
-| --- | --- |
-| Database | `insightflow` |
-| User | `insightflow_user` |
-| Password | `insightflow_pass` |
-| Port | `5432` |
-| Volume | `insightflow_postgres_data` |
-
-## PostgreSQL Setup
-
-Import the Olist CSV files into PostgreSQL:
+Regenerate fallback analytics from CSV files, then run the backend:
 
 ```bash
-python3 scripts/import_olist_to_postgres.py
-```
-
-Run the backend in PostgreSQL analytics mode:
-
-```bash
-export INSIGHTFLOW_ANALYTICS_MODE=postgres
-cd backend
-./mvnw spring-boot:run
-```
-
-Or run everything through the helper script:
-
-```bash
-./scripts/run_local.sh postgres
-```
-
-Skip re-importing data on later starts:
-
-```bash
-./scripts/run_local.sh postgres --skip-import
-```
-
-## JSON Fallback Mode
-
-JSON mode is useful for demos when PostgreSQL is not available.
-
-```bash
+python3 scripts/generate_analytics.py
 export INSIGHTFLOW_ANALYTICS_MODE=json
 cd backend
 ./mvnw spring-boot:run
 ```
 
-Regenerate fallback analytics from CSVs:
+### PostgreSQL Mode
+
+Start PostgreSQL, import CSVs, then run the backend:
 
 ```bash
-python3 scripts/generate_analytics.py
+docker compose up -d
+python3 scripts/import_olist_to_postgres.py
+export INSIGHTFLOW_ANALYTICS_MODE=postgres
+cd backend
+./mvnw spring-boot:run
 ```
 
-Generated files are stored in `backend/src/main/resources/` and `database/`.
-
-## AI Configuration
-
-InsightFlow works without an AI key by using local deterministic analyst output:
+Or use the helper script:
 
 ```bash
-export INSIGHTFLOW_AI_PROVIDER=local
+./scripts/run_local.sh postgres
+./scripts/run_local.sh postgres --skip-import
 ```
 
-To use OpenAI-backed responses:
+### Docker Setup
 
-```bash
-export INSIGHTFLOW_AI_PROVIDER=openai
-export OPENAI_API_KEY=<your-api-key>
-export OPENAI_MODEL=gpt-5.5
-```
+`docker-compose.yml` provides PostgreSQL on port `5432` with database `insightflow`, user `insightflow_user`, password `insightflow_pass`, and persistent volume `insightflow_postgres_data`.
 
-The AI layer receives aggregated metrics only. It does not send raw CSV rows, passwords, database credentials, or arbitrary SQL.
+## 🔌 REST API
 
-## API Overview
-
-| Method | Endpoint | Auth | Purpose |
+| Method | Endpoint | Auth | Description |
 | --- | --- | --- | --- |
-| `GET` | `/api/health` | Public | Deployment health check |
+| `GET` | `/api/health` | Public | Health check |
 | `GET` | `/api/analytics/summary` | Public | Filtered KPIs and chart datasets |
-| `POST` | `/api/ai/report` | Public | Executive business report |
+| `POST` | `/api/ai/report` | Public | Executive report |
 | `POST` | `/api/ai/query` | Public | Natural-language analytics answer |
 | `POST` | `/api/auth/register` | Public | Create account and return JWT |
 | `POST` | `/api/auth/login` | Public | Login and return JWT |
 | `GET` | `/api/auth/me` | JWT | Current user profile |
 | `GET` | `/api/dashboards` | JWT | List saved dashboards |
-| `POST` | `/api/dashboards` | JWT | Save dashboard view |
+| `POST` | `/api/dashboards` | JWT | Save dashboard |
+| `PUT` | `/api/dashboards/{dashboardId}` | JWT | Update saved dashboard |
+| `DELETE` | `/api/dashboards/{dashboardId}` | JWT | Delete saved dashboard |
+| `GET` | `/api/preferences` | JWT | Get dashboard preferences |
 | `PUT` | `/api/preferences` | JWT | Update dashboard preferences |
 
-**Analytics example**
+Analytics filters:
+
+| Query Param | Example |
+| --- | --- |
+| `startDate` | `2018-01-01` |
+| `endDate` | `2018-08-31` |
+| `state` | `SP` |
+| `category` | `Health Beauty` |
+| `paymentType` | `Credit Card` |
+
+Example request:
 
 ```bash
 curl "http://localhost:8080/api/analytics/summary?state=SP&paymentType=Credit%20Card"
 ```
 
-**AI example**
+Example response:
 
-```bash
-curl -X POST "http://localhost:8080/api/ai/query" \
-  -H "Content-Type: application/json" \
-  -d '{"question":"Which categories should I promote?","filters":{"state":"SP"}}'
+```json
+{
+  "generatedAt": "2026-07-09T00:00:00Z",
+  "source": "PostgreSQL-backed Brazilian Olist ecommerce dataset",
+  "filters": { "state": "SP", "paymentType": "Credit Card" },
+  "kpis": {
+    "totalRevenue": 4035524.63,
+    "totalOrders": 31159,
+    "averageOrderValue": 129.51,
+    "repeatCustomerRate": 3.0,
+    "averageReviewScore": 4.25,
+    "deliveryDelayRate": 5.4
+  },
+  "revenueByMonth": [],
+  "topCategories": [],
+  "empty": false
+}
 ```
 
-**Login example**
-
-```bash
-curl -X POST "http://localhost:8080/api/auth/login" \
-  -H "Content-Type: application/json" \
-  -d '{"email":"demo@example.com","password":"portfolio-pass"}'
-```
-
-## Environment Variables
-
-| Variable | Example | Purpose |
-| --- | --- | --- |
-| `INSIGHTFLOW_ANALYTICS_MODE` | `auto`, `postgres`, `json` | Select analytics source |
-| `DATABASE_URL` | `jdbc:postgresql://localhost:5432/insightflow` | Spring JDBC URL |
-| `DATABASE_USERNAME` | `insightflow_user` | Database username |
-| `DATABASE_PASSWORD` | `insightflow_pass` | Database password |
-| `SPRING_SQL_INIT_MODE` | `never`, `always` | Schema initialization mode |
-| `INSIGHTFLOW_AI_PROVIDER` | `local`, `openai` | AI response provider |
-| `OPENAI_API_KEY` | empty locally | Optional OpenAI key |
-| `OPENAI_MODEL` | `gpt-5.5` | OpenAI model name |
-| `INSIGHTFLOW_JWT_SECRET` | long random string | JWT signing secret |
-| `INSIGHTFLOW_JWT_EXPIRATION_MINUTES` | `1440` | JWT lifetime |
-
-Do not commit real secrets. For deployed environments, generate a strong JWT secret:
-
-```bash
-openssl rand -base64 48
-```
-
-## Project Structure
+## 📁 Project Structure
 
 ```text
 insightflow/
-├── backend/                         # Spring Boot API
-│   └── src/main/java/com/sophia/insightflow/
-│       ├── ai/                      # AI analyst endpoints and service
-│       ├── analytics/               # Analytics API, DTOs, SQL repository, fallback service
-│       ├── auth/                    # JWT auth, users, security config
-│       ├── config/                  # Health check and deployment config
-│       └── dashboard/               # Saved dashboards and preferences
-├── frontend/                        # Dashboard UI
-├── database/                        # Schema, SQL analysis queries, JSON fallback artifacts
-├── data/                            # Olist CSV files
-├── docs/                            # Screenshots, demo GIF, deployment notes
-├── scripts/                         # Import, generation, and local run scripts
-├── docker-compose.yml               # Local PostgreSQL
-├── Dockerfile                       # Production image
-├── render.yaml                      # Render Blueprint
+├── backend/                  # Spring Boot API, services, repositories, DTOs, tests
+├── frontend/                 # Static dashboard UI
+├── database/                 # Schema, reference SQL, generated JSON analytics
+├── docs/                     # Screenshots, demo GIF, deployment notes
+├── scripts/                  # CSV import, JSON generation, local run helper
+├── data/                     # Local Olist CSV files; ignored by Git
+├── docker-compose.yml        # Local PostgreSQL
+├── Dockerfile                # Production image
+├── render.yaml               # Render Blueprint
 └── README.md
 ```
 
-## Deployment
+## ✅ Testing
 
-InsightFlow is designed to deploy as one Spring Boot web service. The backend serves the static frontend, so the dashboard and API use the same origin in production.
-
-Deployment files:
-
-- `Dockerfile` builds the Spring Boot jar and bundles the frontend.
-- `render.yaml` defines the Render web service, managed PostgreSQL database, generated JWT secret, and `/api/health` check.
-- `docs/deployment.md` contains the deployment checklist.
-
-Render flow:
-
-1. Push this repository to GitHub.
-2. In Render, create a new Blueprint from `render.yaml`.
-3. Keep `INSIGHTFLOW_ANALYTICS_MODE=json` for an instant demo, or switch to `postgres` after importing hosted data.
-4. Add `OPENAI_API_KEY` only if you want OpenAI-backed analyst responses.
-5. Replace the placeholder live links at the top of this README.
-
-## Testing
-
-Run backend tests:
+Commands:
 
 ```bash
 cd backend
@@ -415,37 +262,87 @@ Run the frontend syntax check:
 node --check frontend/src/app.js
 ```
 
-Current tests cover analytics calculations, filtered API behavior, PostgreSQL repository wiring, JSON fallback behavior, AI endpoints, JWT auth, saved dashboards, preferences, and public deployment endpoints.
+Tested areas:
 
-## Troubleshooting
+- Analytics calculations and filtered API responses
+- PostgreSQL query wiring and JSON fallback behavior
+- AI endpoints and local fallback behavior
+- JWT registration/login and protected workspace routes
+- Saved dashboards, preferences, and public deployment endpoints
 
-| Problem | Fix |
+## 🚢 Deployment
+
+### Docker Compose
+
+Docker Compose is used for local PostgreSQL:
+
+```bash
+docker compose up -d
+python3 scripts/import_olist_to_postgres.py
+```
+
+The Spring Boot backend is run separately with `./mvnw spring-boot:run`.
+
+### Render
+
+`render.yaml` defines a Render web service, PostgreSQL database, generated JWT secret, production profile, and `/api/health` health check.
+
+Recommended Render flow:
+
+1. Push this repository to GitHub.
+2. Create a Render Blueprint from `render.yaml`.
+3. Keep `INSIGHTFLOW_ANALYTICS_MODE=json` for the fastest public demo.
+4. Switch to `postgres` only after importing data into the hosted database.
+
+### Environment Variables
+
+| Variable | Purpose |
 | --- | --- |
-| Dashboard shows JSON fallback | Start PostgreSQL, import data, and set `INSIGHTFLOW_ANALYTICS_MODE=postgres` or `auto` |
-| PostgreSQL connection fails | Check Docker status, port `5432`, and `.env` database values |
-| Import script needs a driver | Install `psql` or run `python3 -m pip install 'psycopg[binary]'` |
-| Demo login fails in PostgreSQL mode | Re-run `python3 scripts/import_olist_to_postgres.py`; schema seeds the demo user |
-| AI returns local output | Set `INSIGHTFLOW_AI_PROVIDER=openai` and provide `OPENAI_API_KEY` |
-| Static frontend calls wrong API | Use `http://localhost:8080`, or add `?api=http://localhost:8080` in static mode |
+| `INSIGHTFLOW_ANALYTICS_MODE` | `auto`, `postgres`, or `json` |
+| `DATABASE_URL` | JDBC or Render PostgreSQL connection URL |
+| `DATABASE_USERNAME` | PostgreSQL username |
+| `DATABASE_PASSWORD` | PostgreSQL password |
+| `SPRING_SQL_INIT_MODE` | Schema initialization mode |
+| `INSIGHTFLOW_AI_PROVIDER` | `local`, `openai`, or `auto` |
+| `OPENAI_API_KEY` | Optional OpenAI API key |
+| `OPENAI_MODEL` | OpenAI model name |
+| `INSIGHTFLOW_JWT_SECRET` | JWT signing secret |
+| `INSIGHTFLOW_JWT_EXPIRATION_MINUTES` | JWT lifetime |
 
-## Future Roadmap
+Never commit real secrets. See `.env.example` for local defaults.
 
-- Testcontainers integration tests with real PostgreSQL.
-- CI/CD pipeline with deployment previews.
-- Managed migrations with Flyway or Liquibase.
-- Team workspaces and dashboard sharing.
-- Scheduled executive reports.
-- AI report history per user.
-- Chart image export.
-- Refresh tokens and password reset flow.
+## 🗺️ Roadmap
 
-## Resume Bullet Points
+Completed:
 
-- Built a full-stack ecommerce analytics platform with Java 21, Spring Boot, PostgreSQL, Docker, and vanilla JavaScript.
-- Designed a Python import pipeline to load raw Olist CSV files into normalized PostgreSQL tables for SQL-backed analytics.
-- Implemented dashboard filters, KPI calculations, revenue trends, category rankings, regional revenue, payment mix, review distribution, and delivery-delay analysis.
-- Added JSON fallback mode so the dashboard remains demo-ready when PostgreSQL is unavailable.
-- Built a responsive dashboard with interactive charts, source-mode indicators, empty states, saved views, preferences, and CSV export.
-- Integrated JWT authentication with BCrypt password hashing and protected user workspace endpoints.
-- Added an AI Business Analyst for executive reports and natural-language metric questions with local and OpenAI-backed modes.
-- Created Docker Compose, Render deployment configuration, health checks, and automated tests covering analytics, auth, AI, fallback behavior, and API routes.
+- [x] Spring Boot backend
+- [x] PostgreSQL analytics
+- [x] JWT authentication
+- [x] AI Business Analyst
+- [x] Interactive dashboard
+- [x] Docker deployment files
+- [x] CSV export
+
+Planned:
+
+- [ ] GitHub Actions CI/CD
+- [ ] Redis caching
+- [ ] Kubernetes deployment
+- [ ] OpenAPI/Swagger
+- [ ] Real-time analytics
+
+## 🤝 Contributing
+
+Contributions are welcome for bug fixes, documentation improvements, tests, and small maintainability upgrades.
+
+```bash
+git checkout -b feature/your-change
+cd backend
+./mvnw test
+```
+
+Please keep changes focused and avoid committing `.env`, build artifacts, or files under `data/`.
+
+## 📄 License
+
+No license file has been added yet. Add a license before accepting external contributions or reusing this project outside portfolio/demo contexts.
