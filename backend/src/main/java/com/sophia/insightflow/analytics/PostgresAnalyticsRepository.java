@@ -17,17 +17,23 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class PostgresAnalyticsRepository {
 
   private static final String CATEGORY_EXPR =
       "initcap(replace(coalesce(t.product_category_name_english, p.product_category_name, 'unknown'), '_', ' '))";
+  private static final String CATEGORY_FILTER_EXPR =
+      "lower(replace(coalesce(t.product_category_name_english, p.product_category_name, 'unknown'), '_', ' '))";
   private static final String PAYMENT_EXPR = "initcap(replace(op.payment_type, '_', ' '))";
+  private static final String FILTERED_ITEMS_TABLE = "filtered_analytics_items";
+  private static final String FILTERED_ORDERS_TABLE = "filtered_analytics_orders";
 
   private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -35,19 +41,19 @@ public class PostgresAnalyticsRepository {
     this.jdbcTemplate = jdbcTemplate;
   }
 
+  @Transactional
   public AnalyticsSummaryResponse summarize(AnalyticsFilter filter) {
     MapSqlParameterSource params = params(filter);
-    KpiSummary kpis = jdbcTemplate.queryForObject(kpiSql(filter), params, this::mapKpis);
+    createFilteredAnalyticsTables(filter, params);
+    KpiSummary kpis = jdbcTemplate.queryForObject(kpiSql(), params, this::mapKpis);
     List<MonthlyRevenueMetric> monthlyRevenue =
-        jdbcTemplate.query(monthlySql(filter), params, this::mapMonthlyRevenue);
-    List<CategoryMetric> topCategories =
-        jdbcTemplate.query(categorySql(filter), params, this::mapCategory);
-    List<StateMetric> revenueByState =
-        jdbcTemplate.query(stateSql(filter), params, this::mapState);
+        jdbcTemplate.query(monthlySql(), params, this::mapMonthlyRevenue);
+    List<CategoryMetric> topCategories = jdbcTemplate.query(categorySql(), params, this::mapCategory);
+    List<StateMetric> revenueByState = jdbcTemplate.query(stateSql(), params, this::mapState);
     List<PaymentMetric> paymentBreakdown =
         jdbcTemplate.query(paymentSql(filter), params, this::mapPayment);
     List<ReviewScoreMetric> reviewDistribution =
-        jdbcTemplate.query(reviewDistributionSql(filter), params, this::mapReviewDistribution);
+        jdbcTemplate.query(reviewDistributionSql(), params, this::mapReviewDistribution);
 
     return new AnalyticsSummaryResponse(
         Instant.now().toString(),
@@ -67,7 +73,7 @@ public class PostgresAnalyticsRepository {
     LocalDate minDate =
         jdbcTemplate.queryForObject(
             """
-            SELECT min(order_purchase_timestamp::date)
+            SELECT min(order_purchase_timestamp)::date
             FROM insightflow.orders
             WHERE order_status = 'delivered'
               AND order_purchase_timestamp IS NOT NULL
@@ -77,7 +83,7 @@ public class PostgresAnalyticsRepository {
     LocalDate maxDate =
         jdbcTemplate.queryForObject(
             """
-            SELECT max(order_purchase_timestamp::date)
+            SELECT max(order_purchase_timestamp)::date
             FROM insightflow.orders
             WHERE order_status = 'delivered'
               AND order_purchase_timestamp IS NOT NULL
@@ -118,22 +124,21 @@ public class PostgresAnalyticsRepository {
     return new FilterOptions(minDate, maxDate, states, categories, paymentTypes);
   }
 
-  private String kpiSql(AnalyticsFilter filter) {
-    return filteredItemsCte(filter)
-        + """
-        , order_rollup AS (
-          SELECT
-            order_id,
-            customer_unique_id,
-            sum(item_revenue) AS order_revenue,
-            max(review_score) AS review_score,
-            bool_or(delivery_delayed) AS delivery_delayed
-          FROM filtered_items
-          GROUP BY order_id, customer_unique_id
-        ),
-        customer_rollup AS (
+  private void createFilteredAnalyticsTables(AnalyticsFilter filter, MapSqlParameterSource params) {
+    jdbcTemplate.getJdbcOperations().execute("SET LOCAL work_mem = '64MB'");
+    jdbcTemplate.getJdbcOperations().execute("DROP TABLE IF EXISTS pg_temp." + FILTERED_ORDERS_TABLE);
+    jdbcTemplate.getJdbcOperations().execute("DROP TABLE IF EXISTS pg_temp." + FILTERED_ITEMS_TABLE);
+    jdbcTemplate.update(createFilteredItemsSql(filter), params);
+    jdbcTemplate.getJdbcOperations().execute("ANALYZE " + FILTERED_ITEMS_TABLE);
+    jdbcTemplate.getJdbcOperations().execute(createFilteredOrdersSql());
+    jdbcTemplate.getJdbcOperations().execute("ANALYZE " + FILTERED_ORDERS_TABLE);
+  }
+
+  private String kpiSql() {
+    return """
+        WITH customer_rollup AS (
           SELECT customer_unique_id, count(*) AS order_count
-          FROM order_rollup
+          FROM filtered_analytics_orders
           GROUP BY customer_unique_id
         )
         SELECT
@@ -141,43 +146,41 @@ public class PostgresAnalyticsRepository {
           count(*) AS total_orders,
           coalesce(sum(order_revenue) / nullif(count(*), 0), 0) AS average_order_value,
           coalesce(
-            count(DISTINCT order_rollup.customer_unique_id) FILTER (
-              WHERE order_rollup.customer_unique_id IN (
+            count(DISTINCT filtered_analytics_orders.customer_unique_id) FILTER (
+              WHERE filtered_analytics_orders.customer_unique_id IN (
                 SELECT customer_unique_id FROM customer_rollup WHERE order_count > 1
               )
-            )::numeric / nullif(count(DISTINCT order_rollup.customer_unique_id), 0) * 100,
+            )::numeric / nullif(count(DISTINCT filtered_analytics_orders.customer_unique_id), 0) * 100,
             0
           ) AS repeat_customer_rate,
           avg(review_score) AS average_review_score,
           coalesce(avg(CASE WHEN delivery_delayed THEN 1.0 ELSE 0.0 END) * 100, 0) AS delivery_delay_rate
-        FROM order_rollup
+        FROM filtered_analytics_orders
         """;
   }
 
-  private String monthlySql(AnalyticsFilter filter) {
-    return filteredItemsCte(filter)
-        + """
+  private String monthlySql() {
+    return """
         SELECT
           month,
-          coalesce(sum(item_revenue), 0) AS revenue,
-          count(DISTINCT order_id) AS orders
-        FROM filtered_items
+          coalesce(sum(order_revenue), 0) AS revenue,
+          count(*) AS orders
+        FROM filtered_analytics_orders
         GROUP BY month
         ORDER BY month
         """;
   }
 
-  private String categorySql(AnalyticsFilter filter) {
-    return filteredItemsCte(filter)
-        + """
-        , category_rollup AS (
+  private String categorySql() {
+    return """
+        WITH category_rollup AS (
           SELECT
             product_category AS category,
             order_id,
             sum(item_revenue) AS revenue,
             count(*) AS items,
             max(review_score) AS review_score
-          FROM filtered_items
+          FROM filtered_analytics_items
           GROUP BY product_category, order_id
         )
         SELECT
@@ -193,24 +196,24 @@ public class PostgresAnalyticsRepository {
         """;
   }
 
-  private String stateSql(AnalyticsFilter filter) {
-    return filteredItemsCte(filter)
-        + """
+  private String stateSql() {
+    return """
         SELECT
           customer_state AS state,
-          coalesce(sum(item_revenue), 0) AS revenue,
-          count(DISTINCT order_id) AS orders
-        FROM filtered_items
+          coalesce(sum(order_revenue), 0) AS revenue,
+          count(*) AS orders
+        FROM filtered_analytics_orders
         GROUP BY customer_state
         ORDER BY revenue DESC, state
         """;
   }
 
   private String paymentSql(AnalyticsFilter filter) {
-    return filteredItemsCte(filter)
-        + """
-        , filtered_orders AS (
-          SELECT DISTINCT order_id FROM filtered_items
+    StringBuilder sql =
+        new StringBuilder(
+            """
+        WITH filtered_orders AS (
+          SELECT order_id FROM filtered_analytics_orders
         ),
         payment_totals AS (
           SELECT
@@ -221,10 +224,15 @@ public class PostgresAnalyticsRepository {
             sum(op.payment_value) AS value
           FROM insightflow.order_payments op
           JOIN filtered_orders fo ON fo.order_id = op.order_id
-          WHERE (:paymentType IS NULL OR lower("""
-        + PAYMENT_EXPR
-        + """
-            ) = lower(:paymentType))
+        """);
+    if (filter.paymentType() != null) {
+      sql.append(
+          """
+          WHERE op.payment_type = :paymentTypeKey
+        """);
+    }
+    sql.append(
+        """
           GROUP BY 1
         )
         SELECT
@@ -233,17 +241,16 @@ public class PostgresAnalyticsRepository {
           coalesce(value / nullif(sum(value) OVER (), 0) * 100, 0) AS share
         FROM payment_totals
         ORDER BY value DESC, payment_type
-        """;
+        """);
+    return sql.toString();
   }
 
-  private String reviewDistributionSql(AnalyticsFilter filter) {
-    return filteredItemsCte(filter)
-        + """
-        , order_reviews AS (
-          SELECT order_id, max(review_score) AS review_score
-          FROM filtered_items
+  private String reviewDistributionSql() {
+    return """
+        WITH order_reviews AS (
+          SELECT review_score
+          FROM filtered_analytics_orders
           WHERE review_score IS NOT NULL
-          GROUP BY order_id
         )
         SELECT score, coalesce(count(order_reviews.review_score), 0) AS count
         FROM generate_series(1, 5) AS score
@@ -253,9 +260,11 @@ public class PostgresAnalyticsRepository {
         """;
   }
 
-  private String filteredItemsCte(AnalyticsFilter filter) {
-    return """
-        WITH filtered_items AS (
+  private String createFilteredItemsSql(AnalyticsFilter filter) {
+    StringBuilder sql =
+        new StringBuilder(
+            """
+        CREATE TEMP TABLE filtered_analytics_items ON COMMIT DROP AS
           SELECT
             o.order_id,
             c.customer_unique_id,
@@ -286,33 +295,82 @@ public class PostgresAnalyticsRepository {
           ) r ON r.order_id = o.order_id
           WHERE o.order_status = 'delivered'
             AND o.order_purchase_timestamp IS NOT NULL
-            AND (:startDate IS NULL OR o.order_purchase_timestamp::date >= :startDate)
-            AND (:endDate IS NULL OR o.order_purchase_timestamp::date <= :endDate)
-            AND (:state IS NULL OR lower(c.customer_state) = lower(:state))
-            AND (:category IS NULL OR lower("""
-        + CATEGORY_EXPR
-        + """
-            ) = lower(:category))
-            AND (:paymentType IS NULL OR EXISTS (
-              SELECT 1
-              FROM insightflow.order_payments op
-              WHERE op.order_id = o.order_id
-                AND lower("""
-        + PAYMENT_EXPR
-        + """
-                ) = lower(:paymentType)
-            ))
-        )
+        """);
+    appendFilterClauses(sql, filter);
+    return sql.toString();
+  }
+
+  private String createFilteredOrdersSql() {
+    return """
+        CREATE TEMP TABLE filtered_analytics_orders ON COMMIT DROP AS
+        SELECT
+          order_id,
+          customer_unique_id,
+          month,
+          customer_state,
+          sum(item_revenue) AS order_revenue,
+          max(review_score) AS review_score,
+          bool_or(delivery_delayed) AS delivery_delayed
+        FROM filtered_analytics_items
+        GROUP BY order_id, customer_unique_id, month, customer_state
         """;
   }
 
+  private void appendFilterClauses(StringBuilder sql, AnalyticsFilter filter) {
+    if (filter.startDate() != null) {
+      sql.append("            AND o.order_purchase_timestamp >= :startDate\n");
+    }
+    if (filter.endDate() != null) {
+      sql.append("            AND o.order_purchase_timestamp < :endExclusiveDate\n");
+    }
+    if (filter.state() != null) {
+      sql.append("            AND c.customer_state = :stateCode\n");
+    }
+    if (filter.category() != null) {
+      sql.append("            AND " + CATEGORY_FILTER_EXPR + " = :categoryKey\n");
+    }
+    if (filter.paymentType() != null) {
+      sql.append(
+          """
+            AND EXISTS (
+              SELECT 1
+              FROM insightflow.order_payments op
+              WHERE op.order_id = o.order_id
+                AND op.payment_type = :paymentTypeKey
+            )
+        """);
+    }
+  }
+
   private MapSqlParameterSource params(AnalyticsFilter filter) {
-    return new MapSqlParameterSource()
-        .addValue("startDate", filter.startDate())
-        .addValue("endDate", filter.endDate())
-        .addValue("state", filter.state())
-        .addValue("category", filter.category())
-        .addValue("paymentType", filter.paymentType());
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    if (filter.startDate() != null) {
+      params.addValue("startDate", filter.startDate());
+    }
+    if (filter.endDate() != null) {
+      params.addValue("endExclusiveDate", filter.endDate().plusDays(1));
+    }
+    if (filter.state() != null) {
+      params.addValue("state", filter.state());
+      params.addValue("stateCode", filter.state().toUpperCase(Locale.ROOT));
+    }
+    if (filter.category() != null) {
+      params.addValue("category", filter.category());
+      params.addValue("categoryKey", normalizeDisplayValue(filter.category()));
+    }
+    if (filter.paymentType() != null) {
+      params.addValue("paymentType", filter.paymentType());
+      params.addValue("paymentTypeKey", normalizeStorageKey(filter.paymentType()));
+    }
+    return params;
+  }
+
+  private String normalizeDisplayValue(String value) {
+    return value.trim().replace('_', ' ').toLowerCase(Locale.ROOT);
+  }
+
+  private String normalizeStorageKey(String value) {
+    return value.trim().replace(' ', '_').toLowerCase(Locale.ROOT);
   }
 
   private KpiSummary mapKpis(ResultSet rs, int rowNum) throws SQLException {

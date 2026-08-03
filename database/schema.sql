@@ -111,17 +111,36 @@ CREATE INDEX IF NOT EXISTS idx_orders_status
 CREATE INDEX IF NOT EXISTS idx_orders_purchase_date
   ON insightflow.orders (order_purchase_timestamp);
 
+CREATE INDEX IF NOT EXISTS idx_orders_delivered_purchase
+  ON insightflow.orders (order_purchase_timestamp, order_id, customer_id)
+  WHERE order_status = 'delivered' AND order_purchase_timestamp IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_orders_customer
+  ON insightflow.orders (customer_id);
+
 CREATE INDEX IF NOT EXISTS idx_customers_state
   ON insightflow.customers (customer_state);
 
 CREATE INDEX IF NOT EXISTS idx_order_items_product
   ON insightflow.order_items (product_id);
 
+CREATE INDEX IF NOT EXISTS idx_order_items_order_cover
+  ON insightflow.order_items (order_id) INCLUDE (product_id, price);
+
 CREATE INDEX IF NOT EXISTS idx_order_payments_type
   ON insightflow.order_payments (payment_type);
 
+CREATE INDEX IF NOT EXISTS idx_order_payments_type_order
+  ON insightflow.order_payments (payment_type, order_id);
+
 CREATE INDEX IF NOT EXISTS idx_order_reviews_order
   ON insightflow.order_reviews (order_id);
+
+CREATE INDEX IF NOT EXISTS idx_order_reviews_order_score
+  ON insightflow.order_reviews (order_id, review_score);
+
+CREATE INDEX IF NOT EXISTS idx_products_category_name
+  ON insightflow.products (product_category_name);
 
 CREATE INDEX IF NOT EXISTS idx_saved_dashboards_user
   ON insightflow.saved_dashboards (user_id, updated_at DESC);
