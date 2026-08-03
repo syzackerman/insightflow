@@ -3,7 +3,7 @@
 <h1 align="center">InsightFlow</h1>
 
 <p align="center">
-  Full-stack business analytics platform for Olist ecommerce data with PostgreSQL analytics, JSON fallback mode, JWT workspaces, and an AI Business Analyst.
+  Full-stack business analytics platform for Olist ecommerce data with PostgreSQL analytics, JSON fallback mode, JWT workspaces, and a hybrid analytics assistant.
 </p>
 
 <p align="center">
@@ -29,9 +29,9 @@ Designed as a production-style portfolio project to demonstrate backend engineer
 
 The backend is a Java 21 Spring Boot API with a PostgreSQL query layer, DTO-based responses, JWT authentication, saved dashboards, dashboard preferences, health checks, and test coverage for analytics, auth, AI, and deployment endpoints.
 
-The frontend is a lightweight HTML/CSS/JavaScript dashboard with KPI cards, SVG charts, filters, loading/error/empty states, CSV export, user workspace controls, and AI analyst prompts.
+The frontend is a lightweight HTML/CSS/JavaScript dashboard with KPI cards, SVG charts, filters, loading/error/empty states, CSV export, user workspace controls, and analyst prompts.
 
-InsightFlow supports two analytics modes: PostgreSQL mode for realistic SQL-backed analysis, and JSON fallback mode for demos when a database is unavailable. The AI Business Analyst can run locally without an API key or use OpenAI when configured.
+InsightFlow supports two analytics modes: PostgreSQL mode for realistic SQL-backed analysis, and JSON fallback mode for demos when a database is unavailable. It also includes a hybrid analytics assistant with deterministic local output and optional OpenAI Responses API integration.
 
 ## 🎯 Key Skills Demonstrated
 
@@ -44,7 +44,7 @@ Java · Spring Boot · REST API Design · PostgreSQL · SQL Analytics · JWT Aut
 - 🗄️ Runs PostgreSQL-backed analytics with filtered SQL queries.
 - 🧾 Provides JSON fallback mode with the same `/api/analytics/summary` response shape.
 - 🖥️ Includes an interactive dashboard with KPI cards, filters, charts, source badge, and CSV export.
-- 🤖 Adds an AI Business Analyst for executive reports and natural-language questions.
+- 🤖 Provides a hybrid analytics assistant with deterministic local answers and optional OpenAI Responses API output.
 - 🔐 Supports JWT authentication with BCrypt password hashing.
 - 💾 Saves user dashboards and dashboard preferences.
 - 🐳 Ships Docker Compose PostgreSQL setup with persistent volume and healthcheck.
@@ -113,6 +113,18 @@ The analytics query layer joins orders, customers, items, products, payments, an
 | AI | Local deterministic analyst, optional OpenAI Responses API |
 | DevOps | Docker Compose, Dockerfile, Render Blueprint |
 | Testing | JUnit, Spring MockMvc, Mockito, AssertJ |
+
+## 📊 Local Benchmarks
+
+| Benchmark | Result |
+| --- | --- |
+| Filtered analytics API | 171 ms average across 20 local requests |
+| Full analytics generation | 7.8 seconds |
+| Backend tests | 20 passed, 0 failed |
+
+API latency was measured using 20 identical curl requests and averaged with awk. Analytics generation time was measured using the Unix time command. Results are from a local development environment and are not production guarantees.
+
+See `docs/benchmark-results.md` for methodology and detailed results.
 
 ## ⚙️ Installation
 
@@ -266,7 +278,7 @@ Tested areas:
 
 - Analytics calculations and filtered API responses
 - PostgreSQL query wiring and JSON fallback behavior
-- AI endpoints and local fallback behavior
+- AI endpoints, deterministic local output, and optional OpenAI integration behavior
 - JWT registration/login and protected workspace routes
 - Saved dashboards, preferences, and public deployment endpoints
 
@@ -318,7 +330,7 @@ Completed:
 - [x] Spring Boot backend
 - [x] PostgreSQL analytics
 - [x] JWT authentication
-- [x] AI Business Analyst
+- [x] Hybrid analytics assistant
 - [x] Interactive dashboard
 - [x] Docker deployment files
 - [x] CSV export
